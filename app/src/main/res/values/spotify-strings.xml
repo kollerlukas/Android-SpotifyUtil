@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Spotify String for the Redirect URL-->
+    <string name="com_spotify_sdk_redirect_scheme">callback</string>
+    <string name="com_spotify_sdk_redirect_host">koller.spotifyutil</string>
+</resources>
