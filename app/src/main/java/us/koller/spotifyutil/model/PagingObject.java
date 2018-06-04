@@ -1,12 +1,16 @@
 package us.koller.spotifyutil.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * POJO for wrapper for a PagingObject from the Spotify API
  * */
-@SuppressWarnings("unused")
-public class PagingObject<T> {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class PagingObject<T> implements Parcelable {
 
     private String href;
     private List<T> items;
@@ -71,4 +75,58 @@ public class PagingObject<T> {
     public void setTotal(int total) {
         this.total = total;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(href);
+        //store generics List
+        if (items != null) {
+            parcel.writeInt(items.size());
+            Class<?> objectsType = items.get(0).getClass();
+            parcel.writeSerializable(objectsType);
+            parcel.writeList(items);
+        }
+        parcel.writeInt(limit);
+        parcel.writeString(next);
+        parcel.writeInt(offset);
+        parcel.writeString(previous);
+        parcel.writeInt(total);
+    }
+
+    public final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public PagingObject createFromParcel(Parcel parcel) {
+            PagingObject pagingObject = new PagingObject();
+            parcel.writeString(href);
+            parcel.writeList(items);
+            parcel.writeInt(limit);
+            parcel.writeString(next);
+            parcel.writeInt(offset);
+            parcel.writeString(previous);
+            parcel.writeInt(total);
+
+            pagingObject.setHref(parcel.readString());
+            // read generics List
+            Class<?> type = (Class<?>) parcel.readSerializable();
+            //noinspection unchecked
+            pagingObject.setItems(new ArrayList<>(parcel.readInt()));
+            parcel.readList(pagingObject.getItems(), type.getClassLoader());
+
+            pagingObject.setLimit(parcel.readInt());
+            pagingObject.setNext(parcel.readString());
+            pagingObject.setOffset(parcel.readInt());
+            pagingObject.setPrevious(parcel.readString());
+            pagingObject.setTotal(parcel.readInt());
+            return pagingObject;
+        }
+
+        @Override
+        public PagingObject[] newArray(int i) {
+            return new PagingObject[i];
+        }
+    };
 }

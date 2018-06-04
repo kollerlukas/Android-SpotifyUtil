@@ -63,6 +63,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         this.playlists = playlists;
     }
 
+    public List<Playlist> getPlaylists() {
+        return playlists;
+    }
+
     public void setClickListener(PlaylistClickListener clickListener) {
         this.clickListener = clickListener;
     }

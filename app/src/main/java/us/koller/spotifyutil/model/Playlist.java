@@ -1,10 +1,13 @@
 package us.koller.spotifyutil.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * POJO for a Spotify Playlist
  * */
-@SuppressWarnings("unused")
-public class Playlist {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class Playlist implements Parcelable {
 
     private boolean collaborative;
     private String href;
@@ -69,4 +72,41 @@ public class Playlist {
     public void setTracks(PagingObject<PlaylistTrack> tracks) {
         this.tracks = tracks;
     }
+
+    // Parcelable stuff
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(collaborative ? 1 : 0);
+        parcel.writeString(href);
+        parcel.writeString(id);
+        parcel.writeArray(images);
+        parcel.writeString(name);
+        parcel.writeParcelable(owner, 0);
+        parcel.writeParcelable(tracks, 0);
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Playlist createFromParcel(Parcel parcel) {
+            Playlist playlist = new Playlist();
+            playlist.setCollaborative(parcel.readInt() == 1);
+            playlist.setHref(parcel.readString());
+            playlist.setId(parcel.readString());
+            playlist.setImages((Image[]) parcel.readArray(Image.class.getClassLoader()));
+            playlist.setName(parcel.readString());
+            playlist.setOwner(parcel.readParcelable(User.class.getClassLoader()));
+            playlist.setTracks(parcel.readParcelable(PagingObject.class.getClassLoader()));
+            return playlist;
+        }
+
+        @Override
+        public Playlist[] newArray(int i) {
+            return new Playlist[i];
+        }
+    };
 }

@@ -2,6 +2,7 @@ package us.koller.spotifyutil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +12,7 @@ import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,9 @@ import us.koller.spotifyutil.model.User;
 import us.koller.spotifyutil.spotifyApi.SpotifyApiController;
 
 public class MainActivity extends AppCompatActivity implements PlaylistAdapter.PlaylistClickListener {
+
+    private static final String PLAYLISTS = "koller.PLAYLISTS";
+    private static final String API_CONTROLLER = "koller.API_CONTROLLER";
 
     private static final String CLIENT_ID = "760bffb64af64f7ab95758c76f8d5ad9";
     private static final String REDIRECT_URL = "callback://koller.spotifyutil";
@@ -41,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistAdapter.P
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // launch Login Activity
-        AuthenticationClient.openLoginActivity(this,
-                AUTH_TOKEN_REQUEST_CODE, createAuthRequest());
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.playlists);
+        }
 
         // init recyclerView
         final RecyclerView recyclerView = findViewById(R.id.recycler_view);
@@ -51,6 +57,16 @@ public class MainActivity extends AppCompatActivity implements PlaylistAdapter.P
         adapter = new PlaylistAdapter();
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+
+        if (savedInstanceState == null) {
+            // launch Login Activity
+            AuthenticationClient.openLoginActivity(this,
+                    AUTH_TOKEN_REQUEST_CODE, createAuthRequest());
+        } else {
+            controller = savedInstanceState.getParcelable(API_CONTROLLER);
+            adapter.setPlaylists(savedInstanceState.getParcelableArrayList(PLAYLISTS));
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -111,5 +127,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistAdapter.P
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(API_CONTROLLER, controller);
+        outState.putParcelableArrayList(PLAYLISTS, new ArrayList<>(adapter.getPlaylists()));
     }
 }

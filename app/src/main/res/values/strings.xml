@@ -1,6 +1,5 @@
 <resources>
     <!--Appname is defined in the build.gradle: <string name="app_name">SpotifyUtil</string>-->
-
     <!--Basic Strings-->
-    <string name="log_into_spotify">Log into Spotify</string>
+    <string name="playlists">Playlists</string>
 </resources>

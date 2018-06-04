@@ -185,7 +185,7 @@ public class SpotifyApiController implements Parcelable {
         public void onResult(T result);
     }
 
-    // Parceble stuff
+    // Parcelable stuff
 
     @Override
     public int describeContents() {
